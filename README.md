@@ -213,5 +213,3 @@ Stackcup_Model/
 - Diffusion Policy: https://github.com/real-stanford/diffusion_policy.git
 - Depth Anything V2: https://github.com/DepthAnything/Depth-Anything-V2.git
 - Segment Anything 2: https://github.com/facebookresearch/sam2.git
-# Stackcup-Model
-# Stackcup-Model
