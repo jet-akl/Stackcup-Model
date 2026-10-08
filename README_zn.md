@@ -1,5 +1,7 @@
 # Stackcup Model
 
+![baxter stackcup](./1.jpg "baxter stackcup")
+
 ## 1. 项目概述
 
 本项目旨在基于单张 RGB 图像实现透明物体的机器人抓取。系统结合了以下关键技术：

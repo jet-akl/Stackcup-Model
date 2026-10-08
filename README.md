@@ -1,5 +1,7 @@
 # Stackcup Model
 
+![baxter stackcup](./1.jpg "baxter stackcup")
+
 ## 1. Project Overview
 
 This project aims to enable robotic grasping of transparent objects using a single RGB image. The system integrates the following key technologies:
