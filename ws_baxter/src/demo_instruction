@@ -1,0 +1,14 @@
+terminal
+cd ..
+cd ros_ws
+./baxter.sh
+
+-------------------------------------------------------------------------------
+cd src
+rosrun baxter_examples xdisplay_image.py -f baxter_face.png
+cd demo
+python demo.py
+
+-------------------------------------------------------------------------------
+rosrun baxter_tools tuck_arms.py -u（回归初始状态）noetic
+rosrun baxter_tools tuck_arms.py -t（回归打包状态，关机前回归到打包状态）

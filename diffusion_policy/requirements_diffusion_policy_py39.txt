@@ -1,0 +1,41 @@
+# Minimal requirements for running diffusion-policy (Python 3.9) on an NVIDIA 4090 GPU.
+#
+# IMPORTANT: Install PyTorch with the correct CUDA wheel for your system first
+# (4090 commonly uses CUDA 12.x). Example for CUDA 12.1 (adjust versions as needed):
+#   pip install --index-url https://download.pytorch.org/whl/cu121 torch==2.2.0 torchvision==0.17.0 torchaudio==2.2.0
+# After installing the correct torch/torchvision/torchaudio wheels, install the rest:
+#   pip install -r requirements_diffusion_policy_py39.txt
+#
+# The list below intentionally omits explicit torch/torchvision/torchaudio wheels
+# to avoid mismatched CUDA builds when using `pip install -r` directly.
+
+numpy>=1.23
+scipy>=1.8
+pillow>=9.2
+opencv-python>=4.6.0
+matplotlib>=3.5
+tensorboard>=2.11
+tqdm>=4.64
+hydra-core>=1.2
+omegaconf>=2.1
+pyyaml>=6.0
+gym==0.21.0
+einops>=0.6.0
+scikit-image>=0.19
+imageio>=2.9.0
+accelerate>=0.18
+diffusers>=0.20.0
+transformers>=4.30.0
+tokenizers>=0.13.2
+psutil>=5.9.0
+
+# Optional helpers often used by diffusion-policy projects
+opencv-contrib-python>=4.6.0
+protobuf>=4.21.0
+requests>=2.28
+
+# If you prefer to include torch lines here (only if you know exact CUDA),
+# uncomment and adjust the following example to your CUDA version:
+# torch==2.2.0+cu121
+# torchvision==0.17.0+cu121
+# torchaudio==2.2.0+cu121

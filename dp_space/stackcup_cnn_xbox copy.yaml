@@ -1,0 +1,167 @@
+_target_: diffusion_policy.workspace.stackcup_unet_hybrid_workspace_reverse.StackcupUnetHybridWorkspace
+
+# ALL KEY PARAM
+wandb_log_name: 4_2_xbox
+save_k: 10
+monitor_key: val_loss
+checkpoint_every: 50
+num_epochs: 200
+batch_size: 32
+lr: 0.0001
+weight_decay: 1.0e-05
+dataset_max_train_episodes: 90
+
+horizon: 16
+n_action_steps: 8
+n_latency_steps: 0
+n_obs_steps: 3
+
+num_train_timesteps: 100
+num_inference_steps: 100
+obs_as_global_cond: True
+# past_action_visible: false
+prediction_type: epsilon
+
+shape_meta:
+  action:
+    shape:
+    - 3
+  obs:
+    state:
+      shape:
+      - 3
+      type: low_dim
+    maskdepth:
+      shape:
+      - 3
+      - 400
+      - 640
+      type: rgb
+
+# END
+
+checkpoint:
+  save_last_ckpt: true
+  save_last_snapshot: false
+  topk:
+    format_str: epoch={epoch:04d}-${monitor_key}={${monitor_key}:.3f}.ckpt
+    k: ${save_k}
+    mode: min
+    monitor_key: ${monitor_key}
+dataloader:
+  batch_size: ${batch_size}
+  num_workers: 8
+  persistent_workers: false
+  pin_memory: true
+  shuffle: true
+dataset_obs_steps: ${n_obs_steps}
+ema:
+  _target_: diffusion_policy.model.diffusion.ema_model.EMAModel
+  inv_gamma: 1.0
+  max_value: 0.9999
+  min_value: 0.0
+  power: 0.75
+  update_after_step: 0
+exp_name: default
+keypoint_visible_rate: 1.0
+logging:
+  group: null
+  id: null
+  mode: online
+  name: ${wandb_log_name}
+  project: diffusion_policy_debug
+  resume: true
+  tags:
+  - train_diffusion_unet_hybrid
+  - stackcup
+  - default
+multi_run:
+  run_dir: data/outputs/2025_1_22/1_22_stackcup_transformer_hybrid_depth2
+  wandb_name_base: 2_7_onlydepth_stackcup_transformer_hybrid
+name: train_diffusion_unet_hybrid
+optimizer:
+  _target_: torch.optim.AdamW
+  betas:
+  - 0.95
+  - 0.999
+  eps: 1.0e-08
+  lr: ${lr}
+  weight_decay: ${weight_decay}
+policy:
+  _target_: diffusion_policy.policy.diffusion_unet_image_policy.DiffusionUnetImagePolicy
+
+  shape_meta: ${shape_meta}
+  
+  noise_scheduler:
+    _target_: diffusers.schedulers.scheduling_ddim.DDIMScheduler
+    num_train_timesteps: 100
+    beta_start: 0.0001
+    beta_end: 0.02
+    # beta_schedule is important
+    # this is the best we found
+    beta_schedule: squaredcos_cap_v2
+    clip_sample: True
+    set_alpha_to_one: True
+    steps_offset: 0
+    prediction_type: epsilon # or sample
+
+  obs_encoder:
+    _target_: diffusion_policy.model.vision.multi_image_obs_encoder.MultiImageObsEncoder
+    shape_meta: ${shape_meta}
+    rgb_model:
+      _target_: diffusion_policy.model.vision.model_getter.get_resnet
+      name: resnet18
+      weights: null
+    resize_shape: [240, 320]
+    crop_shape: [216, 288] # ch, cw 240x320 90%
+    random_crop: True
+    use_group_norm: True
+    share_rgb_model: False
+    imagenet_norm: True
+
+  horizon: ${horizon}
+  n_action_steps: ${eval:'${n_action_steps}+${n_latency_steps}'}
+  n_obs_steps: ${n_obs_steps}
+  num_inference_steps: 100
+  obs_as_global_cond: ${obs_as_global_cond}
+  # crop_shape: null
+  diffusion_step_embed_dim: 128
+  down_dims: [512, 1024, 2048]
+  kernel_size: 5
+  n_groups: 8
+  cond_predict_scale: True
+task:
+  dataset:
+    _target_: diffusion_policy.dataset.stackcup_image_dataset.StackcupDataset
+    broadcast_depth_to_rgb: true
+    horizon: ${horizon}
+    max_train_episodes: ${dataset_max_train_episodes}
+    pad_before: ${eval:'${n_obs_steps}-1+${n_latency_steps}'}
+    pad_after: ${eval:'${n_action_steps}-1'}
+    seed: 42
+    val_ratio: 0.2
+    zarr_path: data/data11.zarr
+task_name: stackcup
+training:
+  checkpoint_every: ${checkpoint_every}
+  debug: false
+  device: cuda:0
+  gradient_accumulate_every: 1
+  lr_scheduler: cosine
+  lr_warmup_steps: 500
+  max_train_steps: null
+  max_val_steps: null
+  num_epochs: ${num_epochs}
+  resume: true
+  rollout_every: 10
+  sample_every: 5
+  seed: 42
+  tqdm_interval_sec: 1.0
+  use_ema: true
+  val_every: 1
+val_dataloader:
+  batch_size: 64
+  num_workers: 8
+  persistent_workers: false
+  pin_memory: true
+  shuffle: false

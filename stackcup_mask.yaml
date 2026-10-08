@@ -1,0 +1,47 @@
+dp:
+  dp_checkpoint : &dp_checkpoint './checkpoints/dp_checkpoints/d_n_data11_pure_epoch120.ckpt'
+  # sample_action_epoch140
+  workspace_name : &workspace_name 'dp_space.stackcup_unet_hybrid_workspace.StackcupUnetHybridWorkspace'
+  policy_name : &policy_name 'dp_space.stackcup_unet_hybrid_image_policy.StackcupUnetHybridImagePolicy'
+sam:
+  sam_checkpoint : &sam_checkpoint './checkpoints/sam2.1_hiera_small.pt'
+  sam_type : &sam_type './checkpoints/sam2.1_hiera_s.yaml'
+dam:
+  dam_checkpoint : &dam_checkpoint './checkpoints/depth_anything_v2_vitl.pth'
+  dam_type : &dam_type 'vitl'
+BaxterGripRunner:
+  dp_checkpoint : *dp_checkpoint
+  workspace_name : *workspace_name
+  policy_name : *policy_name
+  sam_checkpoint : *sam_checkpoint
+  sam_type : *sam_type
+  dam_checkpoint : *dam_checkpoint
+  dam_type : *dam_type                                                                                    
+  apply_postprocessing : False
+  # obs_dict : {"image": [],"maskdepth": []}
+  # obs_dict : {"image": [] , "state": [] ,"maskdepth": []}
+  obs_dict : {"maskdepth": []}
+  # obs_dict : {"state": [] ,"maskdepth": []}
+  startPosition : [0.6662041027959035, 0.008202369321740299, 0.3264959378579765]
+  device : 'cuda'
+  box : 'yolo'
+  yolo_checkpoint : './checkpoints/yolo_grip.pt'
+  save_path : null
+  show : True
+  timeout : 0.3
+BaxterStackMaskRunner:
+  sam_checkpoint : *sam_checkpoint
+  sam_type : *sam_type
+  dam_checkpoint : *dam_checkpoint
+  dam_type : *dam_type
+  box : 'yolo'
+  yolo_checkpoint : './checkpoints/yolo_stack.pt'
+  device : 'cuda'
+  motivate : False
+  lr : 0.03
+  weight : 1.0
+  thread : 0.08
+  l_startPosition : [0.6260854130115385, 0.0738297155445202, 0.12093460567152856]
+  r_start_joint : {'right_e0': 0.3551165523954733, 'right_e1': 1.395539021778755, 'right_s0': 0.3136990711225671, 'right_s1': -1.3035001745056303, 'right_w0': 0.09740778003072377, 'right_w1': 1.5485536053703253, 'right_w2': -0.08513593372764046}
+  apply_postprocessing : False
+  timeout : 5.0
